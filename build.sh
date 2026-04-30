@@ -130,6 +130,3 @@ bash $work_dir/bin/modfile/OS3/insmod.sh
 bash $work_dir/bin/modfile/Universal/insfile.sh
 bash $work_dir/bin/modfile/UpdateFile/insupdate.sh
 
-bash $work_dir/packROM.sh
-bash $work_dir/uploadROM.sh
-
