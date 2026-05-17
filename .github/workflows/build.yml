@@ -6,7 +6,11 @@ on:
       input_url:
         description: 'URL of the ROM to build'
         required: true
-      
+      chat_id:
+        description: 'Telegram chat ID to notify when done'
+        required: false
+        default: ''
+
 jobs:
   Initialize:
     runs-on: ubuntu-latest
@@ -31,9 +35,9 @@ jobs:
 
       - name: Set up Time
         run: |
-          echo "Setting Vienam timezone"
+          echo "Setting Vietnam timezone"
           sudo timedatectl set-timezone Asia/Ho_Chi_Minh
-          
+
       - name: Install OpenJDK
         uses: actions/setup-java@v4
         with:
@@ -46,7 +50,7 @@ jobs:
       - name: Install Stuff
         run: |
           sudo bash setup.sh
-        
+
       - name: Giving permission
         run: |
           sudo chmod 777 -R *
@@ -64,13 +68,80 @@ jobs:
       - name: Setup Rclone...
         run: |
           sudo -E bash uploadROM.sh setup "${{ secrets.GH_TOKEN }}" "${{ secrets.GH_REPO }}" "${{ secrets.RCLONE_TOKEN_PATH }}"
-          
+
       - name: Upload ROM...
         run: |
           sudo -E bash uploadROM.sh
-      
-      - name: Update Database and Notificaton to Telegram
-        env:
-          TELEGRAM_TOKEN: ${{ secrets.TG_TOKEN }}
+
+      - name: Get OneDrive Link
+        if: success()
+        id: onedrivelink
         run: |
-          
+          os_type=$(cat bin/ddevice/os_type.txt 2>/dev/null || echo "unknown")
+          rom_os=$(cat bin/ddevice/rom_os.txt 2>/dev/null || echo "unknown")
+          device_code=$(cat bin/ddevice/device_code.txt 2>/dev/null || echo "unknown")
+          polyxver=$(cat Version 2>/dev/null || echo "unknown")
+
+          if [[ $rom_os == "MIUI" ]]; then
+            uploaddir="MIUI"
+            os_label="MIUI"
+          else
+            uploaddir="HyperOS"
+            os_label="HyperOS"
+          fi
+
+          # Lấy link folder OneDrive bằng rclone link
+          FOLDER_PATH="starxONEDRIVE:NTBuild/${uploaddir}/${polyxver}/${device_code}"
+          ONEDRIVE_LINK=$(rclone --config=rclone.conf link "$FOLDER_PATH" 2>/dev/null || echo "")
+
+          echo "ONEDRIVE_LINK=$ONEDRIVE_LINK" >> $GITHUB_OUTPUT
+          echo "OS_LABEL=$os_label" >> $GITHUB_OUTPUT
+          echo "DEVICE_CODE=$device_code" >> $GITHUB_OUTPUT
+          echo "POLYXVER=$polyxver" >> $GITHUB_OUTPUT
+
+      - name: Notify Telegram
+        if: always()
+        env:
+          TG_TOKEN: ${{ secrets.TG_TOKEN }}
+          CHAT_ID: ${{ inputs.chat_id }}
+          JOB_STATUS: ${{ job.status }}
+          ONEDRIVE_LINK: ${{ steps.onedrivelink.outputs.ONEDRIVE_LINK }}
+          OS_LABEL: ${{ steps.onedrivelink.outputs.OS_LABEL }}
+          DEVICE_CODE: ${{ steps.onedrivelink.outputs.DEVICE_CODE }}
+          POLYXVER: ${{ steps.onedrivelink.outputs.POLYXVER }}
+        run: |
+          if [[ -z "$CHAT_ID" ]]; then
+            echo "[INFO] No chat_id provided, skipping Telegram notification."
+            exit 0
+          fi
+
+          if [[ "$JOB_STATUS" == "success" ]]; then
+            if [[ -n "$ONEDRIVE_LINK" ]]; then
+              LINK_TEXT="🔗 <a href=\"${ONEDRIVE_LINK}\">Tải về tại đây</a>"
+            else
+              LINK_TEXT="📂 <code>NTBuild/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/</code>"
+            fi
+
+            MESSAGE="✅ <b>Build hoàn tất!</b>
+
+📱 <b>Device:</b> ${DEVICE_CODE}
+📦 <b>Version:</b> ${POLYXVER}
+🏷️ <b>Type:</b> ${OS_LABEL}
+
+${LINK_TEXT}"
+
+          else
+            RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            MESSAGE="❌ <b>Build thất bại!</b>
+
+📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>
+🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
+          fi
+
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d "{
+              \"chat_id\": \"${CHAT_ID}\",
+              \"text\": \"${MESSAGE}\",
+              \"parse_mode\": \"HTML\"
+            }"
