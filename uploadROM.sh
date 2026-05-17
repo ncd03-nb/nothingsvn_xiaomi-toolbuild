@@ -72,12 +72,12 @@ fi
 
 # Google Drive
 if [[ $rom_os == "MIUI" ]]; then
-    rclone -v --config="$RCLONE_CONFIG_GDRIVE" copyto "$output_file" "$GDRIVE_REMOTE:NTBuild/${uploaddir}/${polyxver}/${device_code}/$(basename $output_file)" || {
+    rclone -v --config="$RCLONE_CONFIG_GDRIVE" copyto "$output_file" "$GDRIVE_REMOTE:NothingsVN/${uploaddir}/${polyxver}/${device_code}/$(basename $output_file)" || {
         upload "Error uploading file to Google Drive"
         exit 1
     }
 else
-    rclone -v --config="$RCLONE_CONFIG_GDRIVE" copyto "$output_file" "$GDRIVE_REMOTE:NTBuild/${uploaddir}/${polyxver}/${device_code}/$(basename $output_file)" || {
+    rclone -v --config="$RCLONE_CONFIG_GDRIVE" copyto "$output_file" "$GDRIVE_REMOTE:NothingsVN/${uploaddir}/${polyxver}/${device_code}/$(basename $output_file)" || {
         upload "Error uploading file to Google Drive"
         exit 1
     }
