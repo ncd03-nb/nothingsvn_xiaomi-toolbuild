@@ -93,7 +93,7 @@ jobs:
           fi
 
           # Lấy link folder Google Drive bằng rclone link
-          FOLDER_PATH="Gdrive:NothingsVN/${uploaddir}/${polyxver}/${device_code}"
+          FOLDER_PATH="Gdrive:NTBuild/${uploaddir}/${polyxver}/${device_code}"
           DRIVE_LINK=$(rclone --config=rclone.conf link "$FOLDER_PATH" 2>/dev/null || echo "")
 
           echo "DRIVE_LINK=$DRIVE_LINK" >> $GITHUB_OUTPUT
@@ -119,30 +119,27 @@ jobs:
 
           if [[ "$JOB_STATUS" == "success" ]]; then
             if [[ -n "$DRIVE_LINK" ]]; then
-              LINK_TEXT="🔗 <a href=\"${DRIVE_LINK}\">Tải về tại đây</a>"
+              LINK_LINE="$DRIVE_LINK"
             else
-              LINK_TEXT="📂 <code>NothingsVN/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/</code>"
+              LINK_LINE="NTBuild/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/"
             fi
 
-            cat > /tmp/tg_payload.json << EOF
-          {
-            "chat_id": "${CHAT_ID}",
-            "parse_mode": "HTML",
-            "text": "✅ <b>Build hoàn tất!</b>\n\n📱 <b>Device:</b> ${DEVICE_CODE}\n📦 <b>Version:</b> ${POLYXVER}\n🏷️ <b>Type:</b> ${OS_LABEL}\n\n${LINK_TEXT}"
-          }
-          EOF
+            TEXT="✅ Build hoàn tất!
+
+            📱 Device: ${DEVICE_CODE}
+            📦 Version: ${POLYXVER}
+            🏷️ Type: ${OS_LABEL}
+            
+            🔗 ${LINK_LINE}"
 
           else
             RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            cat > /tmp/tg_payload.json << EOF
-          {
-            "chat_id": "${CHAT_ID}",
-            "parse_mode": "HTML",
-            "text": "❌ <b>Build thất bại!</b>\n\n📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>\n🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
-          }
-          EOF
+            TEXT="❌ Build thất bại!
+
+          📱 URL ROM: ${{ inputs.input_url }}
+          🔗 Log: ${RUN_URL}"
           fi
 
           curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-            -H "Content-Type: application/json" \
-            -d @/tmp/tg_payload.json
+            --data-urlencode "chat_id=${CHAT_ID}" \
+            --data-urlencode "text=${TEXT}"
