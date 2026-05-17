@@ -7,7 +7,11 @@ on:
         description: 'URL of the ROM to build'
         required: true
       chat_id:
-        description: 'Telegram chat ID to notify when done'
+        description: 'Group chat ID to notify'
+        required: false
+        default: ''
+      user_id:
+        description: 'User ID to send PM with link'
         required: false
         default: ''
 
@@ -106,16 +110,19 @@ jobs:
         env:
           TG_TOKEN: ${{ secrets.TG_TOKEN }}
           CHAT_ID: ${{ inputs.chat_id }}
+          USER_ID: ${{ inputs.user_id }}
           JOB_STATUS: ${{ job.status }}
           DRIVE_LINK: ${{ steps.drivelink.outputs.DRIVE_LINK }}
           OS_LABEL: ${{ steps.drivelink.outputs.OS_LABEL }}
           DEVICE_CODE: ${{ steps.drivelink.outputs.DEVICE_CODE }}
           POLYXVER: ${{ steps.drivelink.outputs.POLYXVER }}
         run: |
-          if [[ -z "$CHAT_ID" ]]; then
-            echo "[INFO] No chat_id provided, skipping Telegram notification."
+          if [[ -z "$CHAT_ID" && -z "$USER_ID" ]]; then
+            echo "[INFO] No chat_id/user_id provided, skipping."
             exit 0
           fi
+
+          PM_ID="${USER_ID:-$CHAT_ID}"
 
           if [[ "$JOB_STATUS" == "success" ]]; then
             if [[ -n "$DRIVE_LINK" ]]; then
@@ -124,22 +131,37 @@ jobs:
               LINK_LINE="NothingsVN/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/"
             fi
 
-            TEXT="✅ Build hoàn tất!
+            curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+              --data-urlencode "chat_id=${PM_ID}" \
+              --data-urlencode "text=✅ Build hoàn tất!
 
-            📱 Device: ${DEVICE_CODE}
-            📦 Version: ${POLYXVER}
-            🏷️ Type: ${OS_LABEL}
-            
-            🔗 ${LINK_LINE}"
-
-          else
-            RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            TEXT="❌ Build thất bại!
-
+          📱 Device: ${DEVICE_CODE}
+          📦 Version: ${POLYXVER}
+          🏷️ Type: ${OS_LABEL}
+          
+          🔗 ${LINK_LINE}"
+          
+                      if [[ -n "$CHAT_ID" && "$CHAT_ID" != "$USER_ID" ]]; then
+                        curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+                          --data-urlencode "chat_id=${CHAT_ID}" \
+                          --data-urlencode "text=✅ Build của [người dùng](tg://user?id=${USER_ID}) hoàn tất! Link đã được gửi vào PM." \
+                          -d "parse_mode=Markdown"
+                      fi
+          
+                    else
+                      RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          
+                      curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+                        --data-urlencode "chat_id=${PM_ID}" \
+                        --data-urlencode "text=❌ Build thất bại!
+          
           📱 URL ROM: ${{ inputs.input_url }}
           🔗 Log: ${RUN_URL}"
-          fi
-
-          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-            --data-urlencode "chat_id=${CHAT_ID}" \
-            --data-urlencode "text=${TEXT}"
+          
+                      if [[ -n "$CHAT_ID" && "$CHAT_ID" != "$USER_ID" ]]; then
+                        curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+                          --data-urlencode "chat_id=${CHAT_ID}" \
+                          --data-urlencode "text=❌ Build của [người dùng](tg://user?id=${USER_ID}) thất bại! Kiểm tra PM để xem log." \
+                          -d "parse_mode=Markdown"
+                      fi
+                    fi
