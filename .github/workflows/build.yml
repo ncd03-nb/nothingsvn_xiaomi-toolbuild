@@ -140,10 +140,21 @@ jobs:
           🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
                     fi
           
-                    curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-                      -H "Content-Type: application/json" \
-                      -d "{
-                        \"chat_id\": \"${CHAT_ID}\",
-                        \"text\": \"${MESSAGE}\",
-                        \"parse_mode\": \"HTML\"
-                      }"
+                    python3 -c "
+          import urllib.request, urllib.parse, json, os
+          token = os.environ['TG_TOKEN']
+          chat_id = os.environ['CHAT_ID']
+          message = os.environ['MESSAGE']
+          data = json.dumps({
+              'chat_id': chat_id,
+              'text': message,
+              'parse_mode': 'HTML'
+          }).encode('utf-8')
+          req = urllib.request.Request(
+              f'https://api.telegram.org/bot{token}/sendMessage',
+              data=data,
+              headers={'Content-Type': 'application/json'}
+          )
+          res = urllib.request.urlopen(req)
+          print(res.read().decode())
+          " 
