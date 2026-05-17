@@ -118,43 +118,53 @@ jobs:
           fi
 
           if [[ "$JOB_STATUS" == "success" ]]; then
-            if [[ -n "$DRIVE_LINK" ]]; then
-              LINK_TEXT="🔗 <a href=\"${DRIVE_LINK}\">Tải về tại đây</a>"
-            else
-              LINK_TEXT="📂 <code>NTBuild/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/</code>"
-            fi
-
-            MESSAGE="✅ <b>Build hoàn tất!</b>
-
-          📱 <b>Device:</b> ${DEVICE_CODE}
-          📦 <b>Version:</b> ${POLYXVER}
-          🏷️ <b>Type:</b> ${OS_LABEL}
-          
-          ${LINK_TEXT}"
-          
-                    else
-                      RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-                      MESSAGE="❌ <b>Build thất bại!</b>
-          
-          📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>
-          🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
-                    fi
-          
-                    python3 -c "
-          import urllib.request, urllib.parse, json, os
+            python3 -c "
+          import urllib.request, json, os
           token = os.environ['TG_TOKEN']
           chat_id = os.environ['CHAT_ID']
-          message = os.environ['MESSAGE']
-          data = json.dumps({
-              'chat_id': chat_id,
-              'text': message,
-              'parse_mode': 'HTML'
-          }).encode('utf-8')
+          drive_link = os.environ.get('DRIVE_LINK', '')
+          device_code = os.environ.get('DEVICE_CODE', 'unknown')
+          polyxver = os.environ.get('POLYXVER', 'unknown')
+          os_label = os.environ.get('OS_LABEL', 'unknown')
+          
+          if drive_link:
+              link_text = f'🔗 <a href=\"{drive_link}\">Tải về tại đây</a>'
+          else:
+              link_text = f'📂 <code>NTBuild/{os_label}/{polyxver}/{device_code}/</code>'
+          
+          message = f'''✅ <b>Build hoàn tất!</b>
+          
+          📱 <b>Device:</b> {device_code}
+          📦 <b>Version:</b> {polyxver}
+          🏷️ <b>Type:</b> {os_label}
+          
+          {link_text}'''
+          
+          data = json.dumps({'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}).encode('utf-8')
           req = urllib.request.Request(
               f'https://api.telegram.org/bot{token}/sendMessage',
-              data=data,
-              headers={'Content-Type': 'application/json'}
+              data=data, headers={'Content-Type': 'application/json'}
           )
-          res = urllib.request.urlopen(req)
-          print(res.read().decode())
-          " 
+          print(urllib.request.urlopen(req).read().decode())
+          "
+                    else
+                      python3 -c "
+          import urllib.request, json, os
+          token = os.environ['TG_TOKEN']
+          chat_id = os.environ['CHAT_ID']
+          run_url = 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
+          input_url = '${{ inputs.input_url }}'
+          
+          message = f'''❌ <b>Build thất bại!</b>
+          
+          📱 <b>URL ROM:</b> <code>{input_url}</code>
+          🔗 <a href=\"{run_url}\">Xem log lỗi tại đây</a>'''
+          
+          data = json.dumps({'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}).encode('utf-8')
+          req = urllib.request.Request(
+              f'https://api.telegram.org/bot{token}/sendMessage',
+              data=data, headers={'Content-Type': 'application/json'}
+          )
+          print(urllib.request.urlopen(req).read().decode())
+          "
+                    fi
