@@ -124,24 +124,24 @@ jobs:
 
             MESSAGE="✅ <b>Build hoàn tất!</b>
 
-📱 <b>Device:</b> ${DEVICE_CODE}
-📦 <b>Version:</b> ${POLYXVER}
-🏷️ <b>Type:</b> ${OS_LABEL}
-
-${LINK_TEXT}"
-
-          else
-            RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            MESSAGE="❌ <b>Build thất bại!</b>
-
-📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>
-🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
-          fi
-
-          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
-            -H "Content-Type: application/json" \
-            -d "{
-              \"chat_id\": \"${CHAT_ID}\",
-              \"text\": \"${MESSAGE}\",
-              \"parse_mode\": \"HTML\"
-            }"
+          📱 <b>Device:</b> ${DEVICE_CODE}
+          📦 <b>Version:</b> ${POLYXVER}
+          🏷️ <b>Type:</b> ${OS_LABEL}
+          
+          ${LINK_TEXT}"
+          
+                    else
+                      RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+                      MESSAGE="❌ <b>Build thất bại!</b>
+          
+          📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>
+          🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
+                    fi
+          
+                    curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+                      -H "Content-Type: application/json" \
+                      -d "{
+                        \"chat_id\": \"${CHAT_ID}\",
+                        \"text\": \"${MESSAGE}\",
+                        \"parse_mode\": \"HTML\"
+                      }"
