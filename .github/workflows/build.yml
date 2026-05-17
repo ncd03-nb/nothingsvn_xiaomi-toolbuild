@@ -93,7 +93,7 @@ jobs:
           fi
 
           # Lấy link folder Google Drive bằng rclone link
-          FOLDER_PATH="Gdrive:NTBuild/${uploaddir}/${polyxver}/${device_code}"
+          FOLDER_PATH="Gdrive:NothingsVN/${uploaddir}/${polyxver}/${device_code}"
           DRIVE_LINK=$(rclone --config=rclone.conf link "$FOLDER_PATH" 2>/dev/null || echo "")
 
           echo "DRIVE_LINK=$DRIVE_LINK" >> $GITHUB_OUTPUT
@@ -121,7 +121,7 @@ jobs:
             if [[ -n "$DRIVE_LINK" ]]; then
               LINK_LINE="$DRIVE_LINK"
             else
-              LINK_LINE="NTBuild/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/"
+              LINK_LINE="NothingsVN/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/"
             fi
 
             TEXT="✅ Build hoàn tất!
