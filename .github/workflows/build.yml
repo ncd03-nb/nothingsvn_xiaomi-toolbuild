@@ -93,7 +93,7 @@ jobs:
           fi
 
           # Lấy link folder Google Drive bằng rclone link
-          FOLDER_PATH="Gdrive:NTBuild/${uploaddir}/${polyxver}/${device_code}"
+          FOLDER_PATH="Gdrive:NothingsVN/${uploaddir}/${polyxver}/${device_code}"
           DRIVE_LINK=$(rclone --config=rclone.conf link "$FOLDER_PATH" 2>/dev/null || echo "")
 
           echo "DRIVE_LINK=$DRIVE_LINK" >> $GITHUB_OUTPUT
@@ -118,53 +118,31 @@ jobs:
           fi
 
           if [[ "$JOB_STATUS" == "success" ]]; then
-            python3 -c "
-          import urllib.request, json, os
-          token = os.environ['TG_TOKEN']
-          chat_id = os.environ['CHAT_ID']
-          drive_link = os.environ.get('DRIVE_LINK', '')
-          device_code = os.environ.get('DEVICE_CODE', 'unknown')
-          polyxver = os.environ.get('POLYXVER', 'unknown')
-          os_label = os.environ.get('OS_LABEL', 'unknown')
-          
-          if drive_link:
-              link_text = f'🔗 <a href=\"{drive_link}\">Tải về tại đây</a>'
-          else:
-              link_text = f'📂 <code>NTBuild/{os_label}/{polyxver}/{device_code}/</code>'
-          
-          message = f'''✅ <b>Build hoàn tất!</b>
-          
-          📱 <b>Device:</b> {device_code}
-          📦 <b>Version:</b> {polyxver}
-          🏷️ <b>Type:</b> {os_label}
-          
-          {link_text}'''
-          
-          data = json.dumps({'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}).encode('utf-8')
-          req = urllib.request.Request(
-              f'https://api.telegram.org/bot{token}/sendMessage',
-              data=data, headers={'Content-Type': 'application/json'}
-          )
-          print(urllib.request.urlopen(req).read().decode())
-          "
-                    else
-                      python3 -c "
-          import urllib.request, json, os
-          token = os.environ['TG_TOKEN']
-          chat_id = os.environ['CHAT_ID']
-          run_url = 'https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}'
-          input_url = '${{ inputs.input_url }}'
-          
-          message = f'''❌ <b>Build thất bại!</b>
-          
-          📱 <b>URL ROM:</b> <code>{input_url}</code>
-          🔗 <a href=\"{run_url}\">Xem log lỗi tại đây</a>'''
-          
-          data = json.dumps({'chat_id': chat_id, 'text': message, 'parse_mode': 'HTML'}).encode('utf-8')
-          req = urllib.request.Request(
-              f'https://api.telegram.org/bot{token}/sendMessage',
-              data=data, headers={'Content-Type': 'application/json'}
-          )
-          print(urllib.request.urlopen(req).read().decode())
-          "
-                    fi
+            if [[ -n "$DRIVE_LINK" ]]; then
+              LINK_TEXT="🔗 <a href=\"${DRIVE_LINK}\">Tải về tại đây</a>"
+            else
+              LINK_TEXT="📂 <code>NothingsVN/${OS_LABEL}/${POLYXVER}/${DEVICE_CODE}/</code>"
+            fi
+
+            cat > /tmp/tg_payload.json << EOF
+          {
+            "chat_id": "${CHAT_ID}",
+            "parse_mode": "HTML",
+            "text": "✅ <b>Build hoàn tất!</b>\n\n📱 <b>Device:</b> ${DEVICE_CODE}\n📦 <b>Version:</b> ${POLYXVER}\n🏷️ <b>Type:</b> ${OS_LABEL}\n\n${LINK_TEXT}"
+          }
+          EOF
+
+          else
+            RUN_URL="https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            cat > /tmp/tg_payload.json << EOF
+          {
+            "chat_id": "${CHAT_ID}",
+            "parse_mode": "HTML",
+            "text": "❌ <b>Build thất bại!</b>\n\n📱 <b>URL ROM:</b> <code>${{ inputs.input_url }}</code>\n🔗 <a href=\"${RUN_URL}\">Xem log lỗi tại đây</a>"
+          }
+          EOF
+          fi
+
+          curl -s -X POST "https://api.telegram.org/bot${TG_TOKEN}/sendMessage" \
+            -H "Content-Type: application/json" \
+            -d @/tmp/tg_payload.json
