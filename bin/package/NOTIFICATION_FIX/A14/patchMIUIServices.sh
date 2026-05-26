@@ -104,7 +104,7 @@ miui-services() {
     jar_util d "miui-services.jar" fw
 
     search="Lmiui/os/Build;->IS_INTERNATIONAL_BUILD:Z"
-    replace="Lmiui/os/Build;->IS_CTA_BUILD:Z"
+    replace="Lmiui/os/Build;->IS_MIUI:Z"
 
     search_tencent="com.tencent.mm"
     replace_google="com.google.android.gms"

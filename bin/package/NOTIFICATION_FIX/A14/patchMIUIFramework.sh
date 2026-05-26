@@ -102,14 +102,9 @@ miui-framework() {
     jar_util d "miui-framework.jar" fw
 
     search="Lmiui/os/Build;->IS_INTERNATIONAL_BUILD"
-    replace="Lmiui/os/Build;->IS_CTA_BUILD"
+    replace="Lmiui/os/Build;->IS_MIUI"
     
     find_and_replace "$search" "$replace"
-
-    search=".field public static final IS_CTA_BUILD:Z = false"
-    replace=".field public static final IS_CTA_BUILD:Z = true"
-
-    find_and_replace_build_file "$search" "$replace"
 
     jar_util a "miui-framework.jar" 
 }

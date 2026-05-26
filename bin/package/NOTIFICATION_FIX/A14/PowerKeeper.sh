@@ -19,7 +19,7 @@ Smali2=$(find "$work_dir/apk_temp/isPowerKeeper.apk.out" -type f -name MilletCon
 tar1="$work_dir/bin/package/NOTIFICATION_FIX/A14/patch/gms.ini"
 tar2="$work_dir/bin/package/NOTIFICATION_FIX/A14/patch/handle.ini"
 
-find "$FOLDER" -type f -name "*.smali" -exec sed -i 's/Lmiui\/os\/Build;->IS_INTERNATIONAL_BUILD:Z/Lmiui\/os\/Build;->IS_CTA_BUILD:Z/g' {} +
+find "$FOLDER" -type f -name "*.smali" -exec sed -i 's/Lmiui\/os\/Build;->IS_INTERNATIONAL_BUILD:Z/Lmiui\/os\/Build;->IS_MIUI:Z/g' {} +
 
 find "$FOLDER" -type f -exec sed -i 's/"_global"/""/g' {} +
 

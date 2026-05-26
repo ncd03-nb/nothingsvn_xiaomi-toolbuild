@@ -1,6 +1,6 @@
 work_dir=$(pwd)
-repS="python3 $work_dir/bin/strRep.py"
 source $work_dir/functions.sh
+repS="python3 $work_dir/bin/strRep.py"
 if [[ ! -d $dir/jar_temp ]]; then
 
 	mkdir $dir/jar_temp
@@ -12,14 +12,14 @@ jar_util()
     cd $work_dir
     #binary
     if [[ $3 == "fw" ]]; then 
-        bak="java -jar $work_dir/bin/apktool/baksmaliv2.jar d --api 32"
-        sma="java -jar $work_dir/bin/apktool/smaliv2.jar a --api 32"
+        bak="java -jar $work_dir/bin/apktool/baksmaliv2.jar d --api 36"
+        sma="java -jar $work_dir/bin/apktool/smaliv2.jar a --api 36"
     fi
 
     if [[ $1 == "d" ]]; then
-        patch "Patching $2 : "
-        if [[ -f $work_dir/build/baserom/images/system/system/framework/miui-services.jar ]]; then
-            sudo cp $work_dir/build/baserom/images/system/system/framework/miui-services.jar $work_dir/jar_temp
+        patch "$2"
+        if [[ -f $work_dir/build/baserom/images/system_ext/framework/miui-services.jar ]]; then
+            sudo cp $work_dir/build/baserom/images/system_ext/framework/miui-services.jar $work_dir/jar_temp
             sudo chown $(whoami) $work_dir/jar_temp/$2
             unzip $work_dir/jar_temp/$2 -d $work_dir/jar_temp/$2.out  >/dev/null 2>&1
             if [[ -d $work_dir/jar_temp/"$2.out" ]]; then
@@ -59,7 +59,7 @@ jar_util()
                 #zip -r -j -0 $work_dir/jar_temp/$2_notal $work_dir/jar_temp/$2.out/.
                 zipalign 4 $work_dir/jar_temp/$2_notal $work_dir/jar_temp/$2
                 if [[ -f $work_dir/jar_temp/$2 ]]; then
-                    sudo cp -rf $work_dir/jar_temp/$2 $work_dir/build/baserom/images/system/system/framework/miui-services.jar
+                    sudo cp -rf $work_dir/jar_temp/$2 $work_dir/build/baserom/images/system_ext/framework/miui-services.jar
                     final_dir="$work_dir/module/*"
                     #7za a -tzip "$work_dir/miui-services_patched_$(date "+%d%m%y").zip" $final_dir
                     patch "Success"
@@ -75,23 +75,31 @@ find_and_replace() {
     local search=$1
     local replace=$2
     local base_dir=$work_dir/jar_temp/miui-services.jar.out
-    local files=(
-        "AppOpsServiceState.smali"
-        "AppOpsServiceStubImpl.smali"
-        "ForceDarkAppListManager.smali"
-        "MiuiBatteryServiceImpl.smali"
-		"MiuiBatteryStatsService$BatteryStatsHandler.smali"
-        "AlarmManagerServiceStubImpl.smali"
+	local files=(
         "ActivityManagerServiceImpl.smali"
-        "BroadcastQueueImpl.smali"
+        "BroadcastQueueModernStubImpl.smali"
+        "MiProcessTracker.smali"
+        "MutableActivityManagerShellCommandStubImpl.smali"
+        "PreStartFeedbackImpl.smali"
         "ProcessManagerService.smali"
         "ProcessPolicy.smali"
         "ProcessSceneCleaner.smali"
-        "NotificationManagerServiceImpl.smali"
-        "ActivityTaskManagerServiceImpl.smali"
-		"SecurityManagerService.smali"
-		"GreezeManagerService.smali"
-		"XSpaceManagerServiceImpl.smali"
+        "AudioServiceStubImpl.smali"
+        "ClipboardChecker.smali"
+        "ClipboardServiceStubImpl.smali"
+        "DevicePolicyManagerServiceStubImpl.smali"
+        "InputManagerServiceStubImpl.smali"
+        "InputMethodManagerServiceImpl.smali"
+        "SogouInputMethodSwitcher.smali"
+        "JobServiceContextImpl.smali"
+        "GnssEventTrackingImpl.smali"
+        "PackageManagerServiceImpl.smali"
+        "MiuiShortcutTriggerHelper\$ShortcutSettingsObserver.smali"
+        "ActivityTaskSupervisorImpl.smali"
+        "MiuiSplitInputMethodImpl.smali"
+        "WindowManagerServiceImpl.smali"
+        "DeviceIdleControllerStubImpl.smali"
+        "ForceDarkAppListManager.smali"
     )
 
     for file in "${files[@]}"; do
@@ -104,11 +112,17 @@ find_and_replace() {
     done
 }
 
+
 miui-services() {
     jar_util d "miui-services.jar" fw
+	
+	p1=$(find "$work_dir/jar_temp/" -type f -name PolicyManager.smali)
 
     find_and_replace "Lmiui/os/Build;->IS_INTERNATIONAL_BUILD:Z" "Lmiui/os/Build;->IS_MIUI:Z"
-    
+	
+	sed -i '/sput-boolean v[0-9]\+, Lcom\/miui\/server\/greeze\/PolicyManager;->CN_MODEL:Z/a\
+\n    const/4 v0, 0x0' $p1
+
     jar_util a "miui-services.jar" 
 }
 
