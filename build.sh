@@ -121,7 +121,6 @@ bash $work_dir/bin/ddevice/getname.sh $getvar
 bash $work_dir/bin/ddevice/fetchINFO.sh
 info "Done"
 
-bash $work_dir/bin/package/patchpackage.sh
 bash $work_dir/bin/modfile/MIUI13/insmod.sh
 bash $work_dir/bin/modfile/MIUI14/insmod.sh
 bash $work_dir/bin/modfile/OS1/insmod.sh
@@ -129,4 +128,5 @@ bash $work_dir/bin/modfile/OS2/insmod.sh
 bash $work_dir/bin/modfile/OS3/insmod.sh
 bash $work_dir/bin/modfile/Universal/insfile.sh
 bash $work_dir/bin/modfile/UpdateFile/insupdate.sh
+bash $work_dir/bin/package/patchpackage.sh
 

@@ -125,5 +125,6 @@ if [[ ! -d $work_dir/jar_temp ]]; then
 fi
 
 if [[ $deviceTYPE == "China" ]]; then
+patch "Fixing Delay Power Button..."
 miui-services
 fi
