@@ -4,7 +4,7 @@ source $WORK_DIR/functions.sh
 debloat_apps=()
 while IFS= read -r line || [[ -n "$line" ]]; do
     debloat_apps+=("$line")
-done < $WORK_DIR/bin/package/DEBLOAT/APPLIST.txt
+done < $WORK_DIR/bin/ddevice/DEBLOAT/APPLIST.txt
 
 rm -rf $WORK_DIR/build/baserom/images/product/etc/auto-install*
 rm -rf $WORK_DIR/build/baserom/images/product/app/Updater
