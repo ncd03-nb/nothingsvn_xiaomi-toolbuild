@@ -47,20 +47,13 @@ mods "Add ROM Information To HyperOS"
   $APKEDITOR d -i $isSettings -o $WORK_DIR/apk_temp/isSettings.apk.out >/dev/null 2>&1
   p1=$(find "$WORK_DIR/apk_temp/isSettings.apk.out" -type f -name MiuiAboutPhoneUtils.smali)
   tar1="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getMiuiVersionInCard.ini"
-  tar2="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getOSVersionCode.ini"
-  tar3="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getRoXmsVersion.ini"
-  tar4="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getXmsVersion.ini"
   my="$WORK_DIR/build/baserom/images/system/system/build.prop"
 
   final_version="${base_rom_code%.*}"
 
   $repS $tar1 $p1
-  $repS $tar2 $p1
-  $repS $tar3 $p1
-  $repS $tar4 $p1
 
   echo "ro.nothings.version=NothingsOOS $final_version | $base_rom_code" >> $my
-  echo "ro.nothings.incremental=${final_version}.OOS" >> $my
 
   mods "Rebuild..."
   Settings=$(basename $isSettings)

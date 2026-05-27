@@ -119,6 +119,7 @@ rm -rf build/baserom/images/super.img
 mods "Gathering Devices Infomations"
 bash $work_dir/bin/ddevice/getname.sh $getvar
 bash $work_dir/bin/ddevice/fetchINFO.sh
+bash $work_dir/bin/ddevice/DEBLOAT/debloat.sh
 info "Done"
 
 bash $work_dir/bin/modfile/MIUI13/insmod.sh
