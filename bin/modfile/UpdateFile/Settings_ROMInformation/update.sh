@@ -53,7 +53,7 @@ mods "Add ROM Information To HyperOS"
 
   $repS $tar1 $p1
 
-  echo "ro.nothings.version=NothingsOOS $final_version | $base_rom_code" >> $my
+  echo "ro.nothings.version=NothingsOS $myversion | $final_version" >> $my
 
   mods "Rebuild..."
   Settings=$(basename $isSettings)
