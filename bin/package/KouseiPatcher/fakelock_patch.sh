@@ -14,7 +14,7 @@ if [ -f $work_dir/build/baserom/images/vendor_boot.img ]; then
   cp -rf $work_dir/build/baserom/images/vendor_boot.img $work_dir
   cp -rf $work_dir/build/baserom/images/vendor_boot.img $work_dir/temp_boot
   $magiskboot unpack -h $work_dir/vendor_boot.img >/dev/null 2>&1
-  sed -i '/^cmdline=/ s/$/ androidboot.verifiedbootstate=green/' $work_dir/header
+  sed -i '/^cmdline=/ s/$/ androidboot.verifiedbootstate=green androidboot.vbmeta.device_state=locked/' $work_dir/header
 
   echo "[IMGPATCH] - Stage 2 Patching..."
   $magiskboot repack $work_dir/vendor_boot.img >/dev/null 2>&1

@@ -1,14 +1,16 @@
 #!/usr/bin/env bash
 # patcher_a16.sh - Android 16 framework/services patcher
 work_dir=$(pwd)
-# Set up environment variables for GitHub workflow
-TOOLS_DIR="$work_dir/bin/apktool"
 WORK_DIR="$work_dir"
 BACKUP_DIR="$WORK_DIR/backup"
 SCRIPT_DIR="$work_dir/bin/package/COREPATCH"
+TOOLS_DIR="$work_dir/bin/apktool"
 source "${SCRIPT_DIR}/helper.sh"
 # Create backup directory
 mkdir -p "$BACKUP_DIR"
+
+# API level for baksmali/smali v2
+API_LEVEL=36
 
 # ============================================
 # Feature Flags (set by command-line arguments)

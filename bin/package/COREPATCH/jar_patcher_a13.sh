@@ -6,96 +6,15 @@ BACKUP_DIR="$work_dir/backup"
 SCRIPT_DIR="$work_dir/bin/package/COREPATCH"
 source "${SCRIPT_DIR}/helper.sh"
 # Create backup directory
-mkdir -p "$backup_dir"
+mkdir -p "$BACKUP_DIR"
+
+# API level for baksmali/smali v2
+API_LEVEL=33
 
 # ============================================
 # Feature Flags (set by command-line arguments)
 # ============================================
 FEATURE_DISABLE_SIGNATURE_VERIFICATION=1
-
-# Function to decompile JAR file
-decompile_jar() {
-  local jar_file="$1"
-  local base_name
-  base_name="$(basename "$jar_file" .jar)"
-  local output_dir="$work_dir/${base_name}_decompile"
-
-  echo "Decompiling $jar_file with apktool..."
-
-  # Validate JAR file before processing
-  if [ ! -f "$jar_file" ]; then
-    echo "❌ Error: JAR file $jar_file not found!"
-    exit 1
-  fi
-
-  # Check if JAR file is valid ZIP
-  if ! unzip -t "$jar_file" > /dev/null 2>&1; then
-    echo "❌ Error: $jar_file is corrupted or not a valid ZIP file!"
-    echo "File size: $(stat -c%s "$jar_file") bytes"
-    echo "File type: $(file "$jar_file")"
-    echo "This usually means the download was incomplete or corrupted."
-    echo "Please check the download URL and try again."
-    exit 1
-  fi
-
-  rm -rf "$output_dir" "$base_name"
-  mkdir -p "$output_dir"
-
-  mkdir -p "$backup_dir/$base_name"
-  unzip -o "$jar_file" "META-INF/*" "res/*" -d "$backup_dir/$base_name" > /dev/null 2>&1
-
-  # Run apktool with better error handling
-  if ! java -jar "$TOOLS_DIR/apktool.jar" d -q -f "$jar_file" -o "$output_dir"; then
-    echo "❌ Error: Failed to decompile $jar_file with apktool"
-    echo "This may indicate the JAR file is corrupted or incompatible."
-    echo "File size: $(stat -c%s "$jar_file") bytes"
-    exit 1
-  fi
-
-  mkdir -p "$output_dir/unknown"
-  cp -r "$BACKUP_DIR/$base_name/res" "$output_dir/unknown/" 2> /dev/null
-  cp -r "$BACKUP_DIR/$base_name/META-INF" "$output_dir/unknown/" 2> /dev/null
-}
-
-# Function to recompile JAR file
-recompile_jar() {
-  local jar_file="$1"
-  local base_name
-  base_name="$(basename "$jar_file" .jar)"
-  local output_dir="$work_dir/${base_name}_decompile"
-  local patched_jar="${base_name}_patched.jar"
-
-  echo "Recompiling $jar_file with apktool..."
-
-  # Check if decompiled directory exists
-  if [ ! -d "$output_dir" ]; then
-    echo "❌ Error: Decompiled directory $output_dir not found!"
-    echo "This means the decompilation step failed."
-    exit 1
-  fi
-
-  # Check if apktool.yml exists (required for recompilation)
-  if [ ! -f "$output_dir/apktool.yml" ]; then
-    echo "⚠️ Warning: apktool.yml not found in $output_dir"
-    echo "This usually means the decompilation didn't create proper metadata."
-    echo "Attempting to continue anyway..."
-  fi
-
-  java -jar "$TOOLS_DIR/redivision.jar" "$output_dir" jar
-
-  # Run apktool with better error handling
-  if ! java -jar "$TOOLS_DIR/apktool.jar" b -q -f "$output_dir" -o "$patched_jar"; then
-    echo "❌ Error: Failed to recompile $output_dir with apktool"
-    echo "This may indicate issues with the decompiled files."
-    echo "Decompiled directory contents:"
-    ls -la "$output_dir" || echo "Directory not accessible"
-    exit 1
-  fi
-
-  java -jar "$TOOLS_DIR/timestamp.jar" "$patched_jar" 1199145600
-
-  echo "Created patched JAR: $patched_jar"
-}
 
 # Function to patch method with direct file path (no searching)
 patch_method_in_file() {

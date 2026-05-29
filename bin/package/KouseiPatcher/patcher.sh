@@ -25,8 +25,8 @@ jar_util()
     cd $dir
     #binary
     if [[ $3 == "fw" ]]; then 
-        bak="java -jar $dir/bin/apktool/baksmali.jar d --api $sdkLevel"
-        sma="java -jar $dir/bin/apktool/smali.jar a --api $sdkLevel"
+        bak="java -jar $dir/bin/apktool/baksmaliv2.jar d --api $sdkLevel"
+        sma="java -jar $dir/bin/apktool/smaliv2.jar a --api $sdkLevel"
     fi
 
     if [[ $1 == "d" ]]; then

@@ -1,8 +1,8 @@
 work_dir=$(pwd)
 source $work_dir/functions.sh
-rom_os=$(cat $WORK_DIR/bin/ddevice/rom_os.txt)
+rom_os=$(cat $work_dir/bin/ddevice/rom_os.txt)
 regionTYPE=$(cat $work_dir/bin/ddevice/device_type.txt)
-androidVER=$(cat $WORK_DIR/bin/ddevice/androidver.txt)
+androidVER=$(cat $work_dir/bin/ddevice/androidver.txt)
 BuildProp1="$work_dir/build/baserom/images/system/system/build.prop"
 BuildProp2="$work_dir/build/baserom/images/product/etc/build.prop"
 BuildProp3="$work_dir/build/baserom/images/system_ext/etc/build.prop"

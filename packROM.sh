@@ -45,12 +45,12 @@ for pname in ${super_list}; do
            esac
         else
            case $pname in
-             mi_ext) addSize=4094304 ;;
-             odm) addSize=104217728 ;;
-             system) addSize=104217728 ;;
-             vendor) addSize=104217728 ;;
-             system_ext) addSize=104217728 ;;
-             product) addSize=114217728 ;;
+             mi_ext) addSize=100000000 ;;
+             odm) addSize=100000000 ;;
+             system) addSize=100000000 ;;
+             vendor) addSize=100000000 ;;
+             system_ext) addSize=100000000 ;;
+             product) addSize=100000000 ;;
              *) addSize=8054432 ;;
            esac
         fi
@@ -135,3 +135,5 @@ fi
 for pname in ${super_list}; do
     rm -rf "$work_dir/build/baserom/images/${pname}.img" 2>/dev/null
 done
+
+find "$work_dir/build" -exec touch -t 200901010000.00 {} + 2> /dev/null || true
