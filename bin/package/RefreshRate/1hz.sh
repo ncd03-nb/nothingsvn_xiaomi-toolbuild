@@ -1,27 +1,37 @@
 work_dir=$(pwd)
-source $work_dir/functions.sh
+ANDROID_DEVICE=$(cat $work_dir/bin/ddevice/device_f.txt)
 gfFile="$work_dir/build/baserom/images/product/etc/device_features/*.xml"
+rom_os=$(cat $work_dir/bin/ddevice/rom_os.txt)
+regionTYPE=$(cat $work_dir/bin/ddevice/device_type.txt)
+str='<item>120</item>'
+str1='<item>90</item>'
+str2='<item>1</item>'
 checkfps='<bool name="support_smart_fps">true</bool>'
 
+#Check DeviceCodeName
+if [ -f $work_dir/build/baserom/images/product/etc/device_features/*.xml ]; then
 
-if [ `grep -c "$checkfps" $gfFile` -eq '0' ];then
-    for gfFile in $gfFile; do
-    mods "Adding SmartFPS..."
-    sed '/<integer name="defaultFps">60<\/integer>/a\    <bool name="support_smart_fps">true<\/bool>\<integer name="smart_fps_value">120<\/integer>' $gfFile > ${gfFile}.new
-    mv ${gfFile}.new $gfFile
-    done
-    mods "Added SmartFPS"
-else
-    mods "Already have SmartFPS"
+if [ `grep -c "$str" $gfFile` -eq '0' ];then
+	sed '/<item>144<\/item>/a\        <item>120<\/item>' $gfFile > ${gfFile}.new
+	mv ${gfFile}.new $gfFile
+	echo "Added 120hz to ${gfFile}"
 fi
 
-mods "Adding more refresh rates..."
-for i in "$gfFile"; do
-  [ -f "$i" ] || continue
-  grep -q '<item>120</item>' "$i" || sed -i '/<item>144<\/item>/a\        <item>120<\/item>' "$i"
-  grep -q '<item>90</item>' "$i" || sed -i '/<item>120<\/item>/a\        <item>90<\/item>' "$i"
-  grep -q '<item>1</item>' "$i" || sed -i '/<item>60<\/item>/a\        <item>1<\/item>' "$i"
-  sed -i 's/>CN</>ALL</g' "$i"
-  grep -q '<bool name="support_aod_fullscreen">true</bool>' "$i" || sed -i '/<\/features>/i\    <bool name="support_aod_fullscreen">true<\/bool>' "$i"
-done
-mods "Done"
+if [ `grep -c "$str1" $gfFile` -eq '0' ];then
+	sed '/<item>120<\/item>/a\        <item>90<\/item>' $gfFile > ${gfFile}.new
+	mv ${gfFile}.new $gfFile
+	echo "Added 90hz to ${gfFile}"
+fi
+
+if [ `grep -c "$str2" $gfFile` -eq '0' ];then
+	sed '/<item>60<\/item>/a\        <item>1<\/item>' $gfFile > ${gfFile}.new
+	mv ${gfFile}.new $gfFile
+	echo "Added 1hz to ${gfFile}"
+fi
+
+if [ `grep -c "$checkfps" $gfFile` -eq '0' ];then
+    sed '/<integer name="defaultFps">60<\/integer>/a\    <bool name="support_smart_fps">true<\/bool>\<integer name="smart_fps_value">120<\/integer>' $gfFile > ${gfFile}.new
+    mv ${gfFile}.new $gfFile
+	echo "Added SmartFPS to ${gfFile}"
+fi
+fi
