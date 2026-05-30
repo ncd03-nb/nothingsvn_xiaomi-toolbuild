@@ -51,7 +51,6 @@ mods "Add ROM Information To HyperOS"
   tar2="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getRoXmsVersion.ini"
   tar3="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getXmsVersion.ini"
   tar4="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getSimpleOSVersion.ini"
-  tar5="$WORK_DIR/bin/modfile/UpdateFile/Settings_ROMInformation/getOSVersionCode.ini"
   my="$WORK_DIR/build/baserom/images/system/system/build.prop"
   final_version="${base_rom_code%.*}"
   simposcode="${final_version#OS}"
@@ -64,8 +63,6 @@ mods "Add ROM Information To HyperOS"
   $repS $tar3 $p1
   mods "Updating getSimpleOSVersionCode"
   $repS $tar4 $p1
-  mods "Updating getOSVersionCode"
-  $repS $tar5 $p1
 
   mods "Updating build.prop"
   echo "ro.nothings.version=NothingsOS $myversion | $final_version" >> $my

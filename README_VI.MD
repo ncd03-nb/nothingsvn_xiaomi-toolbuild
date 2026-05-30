@@ -22,10 +22,9 @@
 | Tính năng | Mô tả |
 |-----------|-------|
 | 📦 **Google Apps** | Cài sẵn GApps cho các bản ROM nội địa (Domestic ROM) |
-| 🤖 **AI Fixing** | Bản vá tương thích thông minh cho ROM nội địa |
 | 🧰 **KaoriOS Toolbox** | Bộ công cụ nâng cao để tuỳ chỉnh và tinh chỉnh hệ thống |
 | 🔄 **Hỗ trợ đa định dạng** | Hỗ trợ `payload.bin`, `new.dat.br` (Brotli), và `super.img` (ROM EU) |
-| 📱 **Mod đa hệ điều hành** | Mod cho MIUI 13, MIUI 14, HyperOS 1, HyperOS 2, HyperOS 3 |
+| 📱 **Mod đa hệ điều hành** | Mod cho HyperOS 1, HyperOS 2, HyperOS 3 |
 | 🧩 **A-only & V-AB** | Hỗ trợ cả sơ đồ phân vùng A-only và Virtual A/B |
 | ⚙️ **Pipeline Tự động** | CI/CD toàn diện qua GitHub Actions |
 | 📤 **Upload lên Cloud** | Tự động tải ROM đã build lên OneDrive qua Rclone |
@@ -64,8 +63,6 @@ nothingsvn_xiaomi-toolbuild/
 │   ├── 📂 ddevice/          # Script nhận diện thiết bị & thông tin ROM
 │   ├── 📂 imgextractor/     # Trình giải nén ảnh EXT4
 │   ├── 📂 modfile/
-│   │   ├── 📂 MIUI13/       # Mod dành cho MIUI 13
-│   │   ├── 📂 MIUI14/       # Mod dành cho MIUI 14
 │   │   ├── 📂 OS1/          # Mod HyperOS 1.0
 │   │   ├── 📂 OS2/          # Mod HyperOS 2.0
 │   │   ├── 📂 OS3/          # Mod HyperOS 3.0

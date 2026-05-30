@@ -22,10 +22,9 @@
 | Feature | Description |
 |---------|-------------|
 | 📦 **Google Apps** | Pre-installed GApps for Domestic ROM variants |
-| 🤖 **AI Fixing** | Intelligent compatibility patches for Domestic ROM |
 | 🧰 **KaoriOS Toolbox** | Advanced system modification & tuning toolkit |
 | 🔄 **Multi-format Support** | Supports `payload.bin`, `new.dat.br` (Brotli), and `super.img` (EU ROMs) |
-| 📱 **Multi-OS Mods** | Mods for MIUI 13, MIUI 14, HyperOS 1, HyperOS 2, HyperOS 3 |
+| 📱 **Multi-OS Mods** | Mods for HyperOS 1, HyperOS 2, HyperOS 3 |
 | 🧩 **A-only & V-AB** | Supports both A-only and Virtual A/B partition schemes |
 | ⚙️ **Automated Pipeline** | End-to-end CI/CD via GitHub Actions |
 | 📤 **Cloud Upload** | Auto-upload built ROMs to OneDrive via Rclone |
@@ -64,8 +63,6 @@ nothingsvn_xiaomi-toolbuild/
 │   ├── 📂 ddevice/          # Device detection & ROM info scripts
 │   ├── 📂 imgextractor/     # EXT4 image extractor
 │   ├── 📂 modfile/
-│   │   ├── 📂 MIUI13/       # MIUI 13 specific mods
-│   │   ├── 📂 MIUI14/       # MIUI 14 specific mods
 │   │   ├── 📂 OS1/          # HyperOS 1.0 mods
 │   │   ├── 📂 OS2/          # HyperOS 2.0 mods
 │   │   ├── 📂 OS3/          # HyperOS 3.0 mods

@@ -122,8 +122,6 @@ bash $work_dir/bin/ddevice/fetchINFO.sh
 bash $work_dir/bin/ddevice/DEBLOAT/debloat.sh
 info "Done"
 
-bash $work_dir/bin/modfile/MIUI13/insmod.sh
-bash $work_dir/bin/modfile/MIUI14/insmod.sh
 bash $work_dir/bin/modfile/OS1/insmod.sh
 bash $work_dir/bin/modfile/OS2/insmod.sh
 bash $work_dir/bin/modfile/OS3/insmod.sh
